@@ -54,10 +54,6 @@ def register():
         confirm_password = request.form['confirmpassword']
         role = request.form['role']
         
-        if password != confirm_password:
-            flash(Messages.REGISTER_PASSWORD_MISMATCH)
-            return redirect(url_for('register'))
-            
         conn = get_db_connection()
         cursor = conn.cursor()
         try:
@@ -65,7 +61,12 @@ def register():
             cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
             if cursor.fetchone():
                 flash(Messages.REGISTER_USERNAME_EXISTS)
-                return redirect(url_for('register'))
+                return render_template('register.html', role=role)
+                
+            # 检查密码是否一致
+            if password != confirm_password:
+                flash(Messages.REGISTER_PASSWORD_MISMATCH)
+                return render_template('register.html', role=role)
                 
             # 插入新用户
             cursor.execute(

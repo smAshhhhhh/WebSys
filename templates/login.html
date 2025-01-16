@@ -19,6 +19,15 @@
                 <!-- 正面 -->
                 <div class="flip-card__front">
                     <div class="title">学生登录</div>
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            <div class="alert">
+                                {% for message in messages %}
+                                    <p>{{ message }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
                     <form class="flip-card__form" action="/login" method="POST">
                         <input class="flip-card__input" name="username" placeholder="Username" type="text" required>
                         <input class="flip-card__input" name="password" placeholder="Password" type="password" required>
@@ -31,6 +40,15 @@
                 <!-- 背面 -->
                 <div class="flip-card__back">
                     <div class="title">教师登录</div>
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            <div class="alert">
+                                {% for message in messages %}
+                                    <p>{{ message }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
                     <form class="flip-card__form" action="/login" method="POST">
                         <input class="flip-card__input" name="username" placeholder="Username" type="text" required>
                         <input class="flip-card__input" name="password" placeholder="Password" type="password" required>
@@ -44,5 +62,7 @@
         </div>
         </div>
     </div>
+    <script src="{{ url_for('static', filename='scripts/roleManager.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/alert.js') }}"></script>
 </body>
 </html>
