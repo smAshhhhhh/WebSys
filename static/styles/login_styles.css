@@ -10,7 +10,7 @@
 	flex-direction: column;			/* 垂直排列 */
 	align-items: center;			/* 水平居中 */
 	justify-content: center;		/* 垂直居中*/
-	height: 100vh;					/* 高度为视口高度的50% */
+	height: 20vh;					/* 高度为视口高度的20% */
 }
 
 /* 切换按钮容器 */

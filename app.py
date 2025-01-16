@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import pymysql
 import config
+from messages import Messages
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -37,7 +38,7 @@ def login():
                 else:
                     return redirect(url_for('teacher_dashboard'))
             else:
-                flash('Invalid username, password or role')
+                flash(Messages.LOGIN_INVALID_CREDENTIALS)
         finally:
             cursor.close()
             conn.close()
@@ -54,7 +55,7 @@ def register():
         role = request.form['role']
         
         if password != confirm_password:
-            flash('Passwords do not match')
+            flash(Messages.REGISTER_PASSWORD_MISMATCH)
             return redirect(url_for('register'))
             
         conn = get_db_connection()
@@ -63,7 +64,7 @@ def register():
             # 检查用户名是否已存在
             cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
             if cursor.fetchone():
-                flash('Username already exists')
+                flash(Messages.REGISTER_USERNAME_EXISTS)
                 return redirect(url_for('register'))
                 
             # 插入新用户
@@ -72,11 +73,11 @@ def register():
                 (username, password, role)
             )
             conn.commit()
-            flash('Registration successful! Please login.')
+            flash(Messages.REGISTER_SUCCESS)
             return redirect(url_for('login'))
         except Exception as e:
             conn.rollback()
-            flash('Registration failed: ' + str(e))
+            flash(Messages.REGISTER_FAILED.format(str(e)))
             return redirect(url_for('register'))
         finally:
             cursor.close()

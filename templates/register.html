@@ -25,6 +25,7 @@
                         <input class="flip-card__input" name="confirmpassword" placeholder="Confirm Password" type="password" required>
                         <input type="hidden" name="role" value="student">
                         <button class="flip-card__btn">sign up！</button>
+                        <p>已有账号？立即<a href="{{ url_for('login') }}" class="register-link">登录</a></p>
                     </form>
                     
                 </div>
@@ -37,13 +38,12 @@
                         <input class="flip-card__input" name="confirmpassword" placeholder="Confirm Password" type="password" required>
                         <input type="hidden" name="role" value="teacher">
                         <button class="flip-card__btn">sign up！</button>
+                        <p>已有账号？立即<a href="{{ url_for('login') }}" class="register-link">登录</a></p>
                     </form>
                 </div>
             </div>
             </label>
-        </div>
-        <div class="login-container">
-            <p>已有账号？立即<a href="{{ url_for('login') }}" class="register-link">登录</a></p>
+        </div>            
         </div>
     </div>
 </body>
