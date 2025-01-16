@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel = "stylesheet" href="static\styles\login_styles.css">
+    <!-- <link rel = "stylesheet" href="static\styles\global_styles.css"> -->
+</head>
+<body>
+    <div class="wrapper">
+        <div class="card-switch">
+            <label class="switch">
+            <input type="checkbox" class="toggle">
+            <span class="slider"></span>
+            <span class="card-side"></span>
+            <!-- 卡片 -->
+            <div class="flip-card__inner">
+                <!-- 正面 -->
+                <div class="flip-card__front">
+                    <div class="title">学生注册</div>
+                    <form class="flip-card__form" action="/register" method="POST">
+                        <input class="flip-card__input" name="username" placeholder="Username" type="text" required>
+                        <input class="flip-card__input" name="password" placeholder="Password" type="password" required>
+                        <input class="flip-card__input" name="confirmpassword" placeholder="Confirm Password" type="password" required>
+                        <input type="hidden" name="role" value="student">
+                        <button class="flip-card__btn">sign up！</button>
+                    </form>
+                    
+                </div>
+                <!-- 背面 -->
+                <div class="flip-card__back">
+                    <div class="title">教师注册</div>
+                    <form class="flip-card__form" action="/register" method="POST">
+                        <input class="flip-card__input" name="username" placeholder="Username" type="text" required>
+                        <input class="flip-card__input" name="password" placeholder="Password" type="password" required>
+                        <input class="flip-card__input" name="confirmpassword" placeholder="Confirm Password" type="password" required>
+                        <input type="hidden" name="role" value="teacher">
+                        <button class="flip-card__btn">sign up！</button>
+                    </form>
+                </div>
+            </div>
+            </label>
+        </div>
+        <div class="login-container">
+            <p>已有账号？立即<a href="{{ url_for('login') }}" class="register-link">登录</a></p>
+        </div>
+    </div>
+</body>
+</html>
