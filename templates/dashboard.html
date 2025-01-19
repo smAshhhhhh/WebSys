@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>仪表板</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('dashboard') }}">
+                    <img src="{{ url_for('static', filename='images/sourceImg/default_avatar.jpg') }}" alt="Logo" class="logo">
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item active">
+                        <a href="#"><span class="nav-icon">📊</span>概览</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#"><span class="nav-icon">📝</span>待定</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#"><span class="nav-icon">⚙️</span>设置</a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            <!-- 顶部导航栏 -->
+            <header class="top-nav">
+                <div class="nav-title">
+                    <h2>仪表板</h2>
+                </div>
+                <div class="user-menu">
+                    <div class="user-info">
+                        <img src="{{ url_for('static', filename='images/sourceImg/default_avatar.jpg') }}" alt="用户头像" class="user-avatar">
+                        <span class="username">{{ session.username }}</span>
+                        <span class="role-badge">{{ '学生' if session.role == 'student' else '教师' }}</span>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="{{ url_for('profile') }}" class="menu-item">
+                            <span class="menu-icon">👤</span>
+                            个人信息
+                        </a>
+                        <a href="#" class="menu-item">
+                            <span class="menu-icon">🔑</span>
+                            修改密码
+                        </a>
+                        <a href="{{ url_for('logout') }}" class="menu-item">
+                            <span class="menu-icon">🚪</span>
+                            退出登录
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 页面内容 -->
+            <div class="content">
+                <div class="welcome-section">
+                    <h1>欢迎回来，{{ session.username }}</h1>
+                    <p>当前身份：{{ '学生' if session.role == 'student' else '教师' }}</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='scripts/dashboard.js') }}"></script>
+</body>
+</html> 

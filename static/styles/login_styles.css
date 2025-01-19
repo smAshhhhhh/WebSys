@@ -1,247 +1,196 @@
-/* 登录页面容器 */
-.wrapper {
-	--input-focus: #2d8cf0;	   /* 输入框聚焦时的颜色 */
-	--font-color: #323232;		   /* 主要文字颜色 */
-	--font-color-sub: #666;	   /* 次要文字颜色 */
-	--bg-color: #fff;			   /* 背景颜色 */
-	--bg-color-alt: #666;		   /* 备用背景颜色 */
-	--main-color: #323232;		   /* 主色调 */
-	display: flex;					/* 使用flex布局*/
-	flex-direction: column;			/* 垂直排列 */
-	align-items: center;			/* 水平居中 */
-	justify-content: center;		/* 垂直居中*/
-	height: 20vh;					/* 高度为视口高度的20% */
+:root {
+    --primary-color: #4a90e2;
+    --error-color: #f44336;
+    --success-color: #4caf50;
+    --text-color: #333;
+    --border-color: #ddd;
+    --background-color: #f5f5f5;
+    --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* 切换按钮容器 */
-.switch {
-	position: relative;				/* 相对定位 */
-	display: flex;					/* 使用flex布局 */
-	flex-direction: column;			/* 垂直排列 */
-	justify-content: center;		/* 垂直居中 */
-	align-items: center;			/* 水平居中 */
-	gap: 30px;						/* 子元素间距 */
-	width: 50px;					/* 容器宽度 */
-	height: 20px;					/* 容器高度 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* 学生端标签样式 */
-.card-side::before {
-	position: absolute;				/* 绝对定位 */
-	content: 'Student';				/* 显示内容 */
-	left: -70px;					/* 左侧偏移 */
-	top: 0;							/* 顶部对齐 */
-	width: 100px;					/* 宽度 */
-	text-decoration: underline;		/* 下划线 */
-	color: var(--font-color);		/* 文字颜色 */
-	font-weight: 600;				/* 字体粗细 */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url('../images/sourceImg/background.svg');
+    background-size: cover;
+    background-position: center;
 }
 
-/* 教师端标签样式 */
-.card-side::after {
-	position: absolute;				/* 绝对定位 */
-	content: 'Teacher';				/* 显示内容 */
-	left: 70px;						/* 右侧偏移 */
-	top: 0;							/* 顶部对齐 */
-	width: 100px;					/* 宽度 */
-	text-decoration: none;			/* 无下划线 */
-	color: var(--font-color);		/* 文字颜色 */
-	font-weight: 600;				/* 字体粗细 */
-}
-
-/* 隐藏的checkbox，用于控制切换 */
-.toggle {
-	opacity: 0;						/* 完全透明 */
-	width: 0;						/* 宽度为0 */
-	height: 0;						/* 高度为0 */
-}
-
-/* 切换按钮滑块 */
-.slider {
-	box-sizing: border-box;			/* 盒模型 */
-	border-radius: 5px;				/* 圆角 */
-	border: 2px solid var(--main-color);	/* 边框 */
-	box-shadow: 4px 4px var(--main-color);	/* 阴影 */
-	position: absolute;				/* 绝对定位 */
-	cursor: pointer;				/* 鼠标指针 */
-	top: 0;							/* 顶部对齐 */
-	left: 0;						/* 左侧对齐 */
-	right: 0;						/* 右侧对齐 */
-	bottom: 0;						/* 底部对齐 */
-	background-color: var(--bg-color);	/* 背景颜色 */
-	transition: 0.3s;				/* 过渡动画 */
-}
-
-/* 滑块按钮样式 */
-.slider:before {
-	box-sizing: border-box;			/* 盒模型 */
-	position: absolute;				/* 绝对定位 */
-	content: "";					/* 空内容 */
-	height: 20px;					/* 高度 */
-	width: 20px;					/* 宽度 */
-	border: 2px solid var(--main-color);	/* 边框 */
-	border-radius: 5px;				/* 圆角 */
-	left: -2px;						/* 左侧偏移 */
-	bottom: 2px;					/* 底部偏移 */
-	background-color: var(--bg-color);	/* 背景颜色 */
-	box-shadow: 0 3px 0 var(--main-color);	/* 阴影 */
-	transition: 0.3s;				/* 过渡动画 */
-}
-
-/* 选中状态下的滑块 */
-.toggle:checked + .slider {
-	background-color: var(--input-focus);	/* 背景颜色 */
-}
-
-/* 选中状态下的滑块按钮 */
-.toggle:checked + .slider:before {
-	transform: translateX(30px);	/* 水平移动 */
-}
-
-/* 选中状态下的学生标签 */
-.toggle:checked ~ .card-side:before {
-	text-decoration: none;			/* 取消下划线 */
-}
-
-/* 选中状态下的教师标签 */
-.toggle:checked ~ .card-side:after {
-	text-decoration: underline;		/* 添加下划线 */
-}
-
-/* 翻转卡片容器 */
-.flip-card__inner {
-	width: 300px;					/* 宽度 */
-	height: 350px;					/* 高度 */
-	position: relative;				/* 相对定位 */
-	background-color: transparent;	/* 透明背景 */
-	perspective: 1000px;			/* 3D透视 */
-	text-align: center;				/* 文字居中 */
-	transition: transform 0.8s;		/* 翻转动画 */
-	transform-style: preserve-3d;	/* 保持3D变换 */
-}
-
-/* 选中状态下的翻转效果 */
-.toggle:checked ~ .flip-card__inner {
-	transform: rotateY(180deg);		/* Y轴旋转180度 */
-}
-
-/* 选中状态下的卡片正面 */
-.toggle:checked ~ .flip-card__front {
-	box-shadow: none;				/* 取消阴影 */
-}
-
-/* 卡片正反面样式 */
-.flip-card__front, .flip-card__back {
-	padding: 60px 20px;				/* 内边距 */
-	position: absolute;				/* 绝对定位 */
-	display: flex;					/* 使用flex布局 */
-	flex-direction: column;			/* 垂直排列 */
-	justify-content: center;		/* 垂直居中 */
-	-webkit-backface-visibility: hidden;	/* 隐藏背面 */
-	backface-visibility: hidden;	/* 隐藏背面 */
-	background: lightgrey;		   /* 背景颜色 */
-	gap: 20px;						/* 子元素间距 */
-	border-radius: 5px;				/* 圆角 */
-	border: 2px solid var(--main-color);	/* 边框 */
-	box-shadow: 4px 4px var(--main-color);	/* 阴影 */
-}
-
-/* 卡片背面样式 */
-.flip-card__back {
-	width: 100%;					/* 宽度100% */
-	transform: rotateY(180deg);		/* Y轴旋转180度 */
-}
-
-/* 登录表单容器 */
-.flip-card__form {
-	display: flex;					/* 使用flex布局 */
-	flex-direction: column;			/* 垂直排列 */
-	align-items: center;			/* 水平居中 */
-	gap: 30px;						/* 子元素间距 */
-}
-
-/* 标题样式 */
-.title {
-	margin: 20px 0 20px 0;			/* 外边距 */
-	font-size: 25px;				/* 字体大小 */
-	font-weight: 900;				/* 字体粗细 */
-	text-align: center;				/* 文字居中 */
-	color: var(--main-color);		/* 文字颜色 */
-}
-
-/* 输入框样式 */
-.flip-card__input {
-	width: 250px;					/* 宽度 */
-	height: 40px;					/* 高度 */
-	border-radius: 5px;				/* 圆角 */
-	border: 2px solid var(--main-color);	/* 边框 */
-	background-color: var(--bg-color);	/* 背景颜色 */
-	box-shadow: 4px 4px var(--main-color);	/* 阴影 */
-	font-size: 15px;				/* 字体大小 */
-	font-weight: 600;				/* 字体粗细 */
-	color: var(--font-color);		/* 文字颜色 */
-	padding: 5px 10px;				/* 内边距 */
-	outline: none;					/* 取消轮廓 */
-}
-
-/* 输入框占位符样式 */
-.flip-card__input::placeholder {
-	color: var(--font-color-sub);	/* 文字颜色 */
-	opacity: 0.8;					/* 透明度 */
-}
-
-/* 输入框聚焦样式 */
-.flip-card__input:focus {
-	border: 2px solid var(--input-focus);	/* 边框颜色 */
-}
-
-/* 按钮点击效果 */
-.flip-card__btn:active, .button-confirm:active {
-	box-shadow: 0px 0px var(--main-color);	/* 取消阴影 */
-	transform: translate(3px, 3px);	/* 位移效果 */
-}
-
-/* 登录按钮样式 */
-.flip-card__btn {
-	margin: 20px 0 20px 0;			/* 外边距 */
-	width: 120px;					/* 宽度 */
-	height: 40px;					/* 高度 */
-	border-radius: 5px;				/* 圆角 */
-	border: 2px solid var(--main-color);	/* 边框 */
-	background-color: var(--bg-color);	/* 背景颜色 */
-	box-shadow: 4px 4px var(--main-color);	/* 阴影 */
-	font-size: 17px;				/* 字体大小 */
-	font-weight: 600;				/* 字体粗细 */
-	color: var(--font-color);		/* 文字颜色 */
-	cursor: pointer;				/* 鼠标指针 */
-}
-
-.register-container {
-	margin: 500px 0px 0px 0px;
-}
-
-.login-container {
-	margin: 570px 0px 0px 0px;
-}
-
-/* 错误提示样式 */
-.alert {
-    position: absolute;
-    top: 20px;
-    width: 80%;
+.container {
+    width: 100%;
     max-width: 400px;
-    padding: 15px;
-    border-radius: 5px;
-    background-color: #ffebee;
-    color: #c62828;
-    border: 1px solid #ef9a9a;
-    text-align: center;
-    font-size: 14px;
-    font-weight: 500;
-    animation: fadeIn 0.3s ease-in-out;
+    padding: 20px;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
+.login-box {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: var(--box-shadow);
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+h2 {
+    text-align: center;
+    color: var(--text-color);
+    margin-bottom: 30px;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.password-container {
+    position: relative;
+    margin-bottom: 5px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    background-image: url('../images/sourceImg/pwd_hide.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 2;
+}
+
+.toggle-password.show {
+    background-image: url('../images/sourceImg/pwd_show.svg');
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #357abd;
+}
+
+button[type="submit"]:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.form-links {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.form-links a {
+    color: var(--primary-color);
+    text-decoration: none;
+    margin: 0 10px;
+}
+
+.form-links span {
+    color: var(--border-color);
+}
+
+.form-links a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    color: var(--error-color);
+    font-size: 14px;
+    margin-top: 5px;
+    display: none;
+    position: relative;
+    z-index: 1;
+}
+
+input.error {
+    border-color: var(--error-color);
+}
+
+.hint {
+    color: #666;
+    font-size: 12px;
+    margin-top: 4px;
+    margin-bottom: 5px;
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .login-box {
+        padding: 20px;
+    }
+    
+    .logo img {
+        width: 80px;
+        height: 80px;
+    }
+    
+    h2 {
+        font-size: 24px;
+    }
+    
+    input, select, button[type="submit"] {
+        font-size: 14px;
+    }
 }

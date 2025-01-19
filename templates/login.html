@@ -1,68 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel = "stylesheet" href="static\styles\login_styles.css">
-    <!-- <link rel = "stylesheet" href="static\styles\global_styles.css"> -->
+    <title>登录</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/auth.css') }}">
 </head>
-<body background="static/images/background.svg" style="background-size: cover;">
-    <div class="wrapper">
-        <div class="card-switch">
-            <label class="switch">
-            <input type="checkbox" class="toggle">
-            <span class="slider"></span>
-            <span class="card-side"></span>
-            <!-- 卡片 -->
-            <div class="flip-card__inner">
-                <!-- 正面 -->
-                <div class="flip-card__front">
-                    <div class="title">学生登录</div>
-                    {% with messages = get_flashed_messages() %}
-                        {% if messages %}
-                            <div class="alert">
-                                {% for message in messages %}
-                                    <p>{{ message }}</p>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    {% endwith %}
-                    <form class="flip-card__form" action="/login" method="POST">
-                        <input class="flip-card__input" name="username" placeholder="Username" type="text" required>
-                        <input class="flip-card__input" name="password" placeholder="Password" type="password" required>
-                        <input type="hidden" name="role" value="student">
-                        <button class="flip-card__btn">Let`s go!</button>
-                        <p>还没有账号？立即<a href="{{ url_for('register') }}" class="register-link">注册</a></p>
-                    </form>
-                    
+<body>
+    <div class="auth-container">
+        <div class="auth-box">
+            <h2>用户登录</h2>
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" name="username" required>
                 </div>
-                <!-- 背面 -->
-                <div class="flip-card__back">
-                    <div class="title">教师登录</div>
-                    {% with messages = get_flashed_messages() %}
-                        {% if messages %}
-                            <div class="alert">
-                                {% for message in messages %}
-                                    <p>{{ message }}</p>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    {% endwith %}
-                    <form class="flip-card__form" action="/login" method="POST">
-                        <input class="flip-card__input" name="username" placeholder="Username" type="text" required>
-                        <input class="flip-card__input" name="password" placeholder="Password" type="password" required>
-                        <input type="hidden" name="role" value="teacher">
-                        <button class="flip-card__btn">Confirm!</button>
-                        <p>还没有账号？立即<a href="{{ url_for('register') }}" class="register-link">注册</a></p>
-                    </form>
+
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password" required>
                 </div>
-            </div>
-            </label>
-        </div>
+
+                <div class="form-group">
+                    <label for="role">身份</label>
+                    <select id="role" name="role" required>
+                        <option value="">请选择身份</option>
+                        <option value="student">学生</option>
+                        <option value="teacher">教师</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="auth-button">登录</button>
+                    <a href="{{ url_for('register') }}" class="auth-link">没有账号？去注册</a>
+                </div>
+            </form>
         </div>
     </div>
-    <script src="{{ url_for('static', filename='scripts/roleManager.js') }}"></script>
-    <script src="{{ url_for('static', filename='scripts/alert.js') }}"></script>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('/login', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    }
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('登录失败，请重试');
+            });
+        });
+    </script>
 </body>
 </html>

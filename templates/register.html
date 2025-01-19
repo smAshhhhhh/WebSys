@@ -1,74 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel = "stylesheet" href="static\styles\login_styles.css">
-    <!-- <link rel = "stylesheet" href="static\styles\global_styles.css"> -->
+    <title>注册</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/auth.css') }}">
 </head>
-<body background="static/images/background.svg" style="background-size: cover;">
-    <div class="wrapper">
-        <div class="flash-messages">
-            
-        </div>
-        
-        <div class="card-switch">
-            <label class="switch">
-            <input type="checkbox" class="toggle">
-            <span class="slider"></span>
-            <span class="card-side"></span>
-            <!-- 卡片 -->
-            <div class="flip-card__inner">
-                <!-- 正面 -->
-                <div class="flip-card__front">
-                    <div class="title">学生注册</div>
-                    {% with messages = get_flashed_messages() %}
-                        {% if messages %}
-                            <div class="alert">
-                                {% for message in messages %}
-                                    <p>{{ message }}</p>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    {% endwith %}
-                    <form class="flip-card__form" action="/register" method="POST">
-                        <input class="flip-card__input" name="username" placeholder="Username" type="text" required>
-                        <input class="flip-card__input" name="password" placeholder="Password" type="password" required>
-                        <input class="flip-card__input" name="confirmpassword" placeholder="Confirm Password" type="password" required>
-                        <input type="hidden" name="role" value="student">
-                        <button class="flip-card__btn">sign up！</button>
-                        <p>已有账号？立即<a href="{{ url_for('login') }}" class="register-link">登录</a></p>
-                    </form>
-                    
+<body>
+    <div class="auth-container">
+        <div class="auth-box">
+            <h2>注册账号</h2>
+            <form id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" name="username" required>
+                    <small class="form-tip">4-20个字符，只能包含字母、数字和下划线</small>
                 </div>
-                <!-- 背面 -->
-                <div class="flip-card__back">
-                    <div class="title">教师注册</div>
-                    {% with messages = get_flashed_messages() %}
-                        {% if messages %}
-                            <div class="alert">
-                                {% for message in messages %}
-                                    <p>{{ message }}</p>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    {% endwith %}
-                    <form class="flip-card__form" action="/register" method="POST">
-                        <input class="flip-card__input" name="username" placeholder="Username" type="text" required>
-                        <input class="flip-card__input" name="password" placeholder="Password" type="password" required>
-                        <input class="flip-card__input" name="confirmpassword" placeholder="Confirm Password" type="password" required>
-                        <input type="hidden" name="role" value="teacher">
-                        <button class="flip-card__btn">sign up！</button>
-                        <p>已有账号？立即<a href="{{ url_for('login') }}" class="register-link">登录</a></p>
-                    </form>
+
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password" required>
+                    <small class="form-tip">6-20个字符，必须包含字母和数字</small>
                 </div>
-            </div>
-            </label>
-        </div>            
+
+                <div class="form-group">
+                    <label for="confirm_password">确认密码</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="role">身份</label>
+                    <select id="role" name="role" required>
+                        <option value="">请选择身份</option>
+                        <option value="student">学生</option>
+                        <option value="teacher">教师</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_number" id="id_label">学号</label>
+                    <input type="text" id="id_number" name="id_number" required>
+                    <small class="form-tip" id="id_tip">请输入学号</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="auth-button">注册</button>
+                    <a href="{{ url_for('login') }}" class="auth-link">已有账号？去登录</a>
+                </div>
+            </form>
         </div>
     </div>
-    <script src="{{ url_for('static', filename='scripts/roleManager.js') }}"></script>
-    <script src="{{ url_for('static', filename='scripts/alert.js') }}"></script>
+
+    <script>
+        document.getElementById('role').addEventListener('change', function() {
+            const idLabel = document.getElementById('id_label');
+            const idTip = document.getElementById('id_tip');
+            const idInput = document.getElementById('id_number');
+            
+            if (this.value === 'student') {
+                idLabel.textContent = '学号';
+                idTip.textContent = '请输入学号';
+                idInput.placeholder = '请输入学号';
+            } else if (this.value === 'teacher') {
+                idLabel.textContent = '教师编号';
+                idTip.textContent = '请输入教师编号';
+                idInput.placeholder = '请输入教师编号';
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('/register', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    }
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('注册失败，请重试');
+            });
+        });
+    </script>
 </body>
-</html>
+</html> 

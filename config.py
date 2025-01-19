@@ -1,8 +1,8 @@
-#MySQL数据库配置
+# 数据库配置
 db_config = {
     'host': 'localhost',
     'user': 'root',
     'password': 'mysql233',
-    'database': 'demo_1',
+    'database': 'bishe',
     'charset': 'utf8mb4'
 }
