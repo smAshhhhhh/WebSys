@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/auth.css') }}">
+</head>
+<body>
+    <div id="message-container"></div>
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='images/sourceImg/default_avatar.jpg') }}" alt="Logo">
+            </div>
+            <h2>注册账号</h2>
+            <form id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" name="username" required>
+                    <small class="form-tip">4-20个字符，只能包含字母、数字和下划线</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <div class="password-container">
+                        <input type="password" id="password" name="password" required>
+                        <button type="button" class="toggle-password" aria-label="切换密码显示"></button>
+                    </div>
+                    <small class="form-tip">6-20个字符，必须包含字母和数字</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password">确认密码</label>
+                    <div class="password-container">
+                        <input type="password" id="confirm_password" name="confirm_password" required>
+                        <button type="button" class="toggle-password" aria-label="切换密码显示"></button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="role">身份</label>
+                    <select id="role" name="role" required>
+                        <option value="" disabled selected>请选择身份</option>
+                        <option value="student">学生</option>
+                        <option value="teacher">教师</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="id_number_group" style="display: none;">
+                    <label for="id_number" id="id_label">学号</label>
+                    <input type="text" id="id_number" name="id_number" required>
+                    <small class="form-tip" id="id_tip">请输入学号</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="auth-button">注册</button>
+                    <a href="{{ url_for('auth.login') }}" class="auth-link">已有账号？去登录</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 显示消息函数
+        function showMessage(message, type = 'error') {
+            const container = document.getElementById('message-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
+            messageDiv.textContent = message;
+            container.appendChild(messageDiv);
+
+            // 触发重排以启动动画
+            messageDiv.offsetHeight;
+            messageDiv.classList.add('show');
+
+            // 3秒后移除消息
+            setTimeout(() => {
+                messageDiv.classList.remove('show');
+                setTimeout(() => {
+                    container.removeChild(messageDiv);
+                }, 300);
+            }, 3000);
+        }
+
+        // 获取元素
+        const roleSelect = document.getElementById('role');
+        const idNumberGroup = document.getElementById('id_number_group');
+        const idLabel = document.getElementById('id_label');
+        const idTip = document.getElementById('id_tip');
+        const idInput = document.getElementById('id_number');
+
+        // 密码显示/隐藏功能
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', function() {
+                const passwordInput = this.previousElementSibling;
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.classList.toggle('show');
+            });
+        });
+
+        // 监听身份选择变化
+        roleSelect.addEventListener('change', function() {
+            // 显示编号输入框
+            idNumberGroup.style.display = 'block';
+            
+            if (this.value === 'student') {
+                idLabel.textContent = '学号';
+                idTip.textContent = '请输入学号';
+                idInput.placeholder = '请输入学号';
+            } else if (this.value === 'teacher') {
+                idLabel.textContent = '教师编号';
+                idTip.textContent = '请输入教师编号';
+                idInput.placeholder = '请输入教师编号';
+            }
+        });
+
+        // 表单提交处理
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 验证身份是否选择
+            if (!roleSelect.value) {
+                showMessage('请选择身份');
+                return;
+            }
+            
+            // 验证编号是否填写
+            if (!idInput.value.trim()) {
+                showMessage(roleSelect.value === 'student' ? '请输入学号' : '请输入教师编号');
+                return;
+            }
+
+            // 验证两次密码是否一致
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            if (password !== confirmPassword) {
+                showMessage('两次输入的密码不一致');
+                return;
+            }
+            
+            const formData = new FormData(this);
+            
+            fetch('/auth/register', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage(data.message, 'success');
+                    if (data.redirect) {
+                        setTimeout(() => {
+                            window.location.href = data.redirect;
+                        }, 1500);
+                    }
+                } else {
+                    showMessage(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('注册失败，请重试');
+            });
+        });
+    </script>
+</body>
+</html> 

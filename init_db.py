@@ -1,23 +1,23 @@
 import pymysql
-import config
+from config import Config
 
 def init_database():
     # 连接MySQL（不指定数据库）
     conn = pymysql.connect(
-        host=config.db_config['host'],
-        user=config.db_config['user'],
-        password=config.db_config['password']
+        host=Config.DB_CONFIG['host'],
+        user=Config.DB_CONFIG['user'],
+        password=Config.DB_CONFIG['password']
     )
     
     cursor = conn.cursor()
     
     try:
         # 创建数据库
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {config.db_config['database']} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
-        print(f"数据库 {config.db_config['database']} 创建成功或已存在")
+        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {Config.DB_CONFIG['database']} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
+        print(f"数据库 {Config.DB_CONFIG['database']} 创建成功或已存在")
         
         # 使用数据库
-        cursor.execute(f"USE {config.db_config['database']}")
+        cursor.execute(f"USE {Config.DB_CONFIG['database']}")
         
         # 创建用户表
         cursor.execute("""
@@ -47,6 +47,36 @@ def init_database():
             )
             conn.commit()
             print("测试用户创建成功")
+        
+        # 创建学生表
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS students (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                student_id VARCHAR(20) NOT NULL UNIQUE,
+                nickname VARCHAR(50),
+                email VARCHAR(100),
+                phone VARCHAR(20),
+                avatar VARCHAR(255),
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        """)
+        print("学生表创建成功或已存在")
+
+        # 创建教师表
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS teachers (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                teacher_id VARCHAR(20) NOT NULL UNIQUE,
+                nickname VARCHAR(50),
+                email VARCHAR(100),
+                phone VARCHAR(20),
+                avatar VARCHAR(255),
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        """)
+        print("教师表创建成功或已存在")
         
         print("数据库初始化完成！")
         

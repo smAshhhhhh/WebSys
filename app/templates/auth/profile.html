@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人信息 - 仪表板</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/profile.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('auth.dashboard') }}">
+                    <img src="{{ url_for('static', filename='images/sourceImg/default_avatar.jpg') }}" alt="Logo" class="logo">
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <a href="{{ url_for('auth.dashboard') }}"><span class="nav-icon">📊</span>概览</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#"><span class="nav-icon">📝</span>待定</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#"><span class="nav-icon">⚙️</span>设置</a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            <!-- 顶部导航栏 -->
+            <header class="top-nav">
+                <div class="nav-title">
+                    <h2>个人信息</h2>
+                </div>
+                <div class="user-menu">
+                    <div class="user-info">
+                        <img src="{{ url_for('static', filename=session.avatar if session.avatar else 'images/sourceImg/default_avatar.jpg') }}" alt="用户头像" class="user-avatar">
+                        <span class="username">{{ session.nickname if session.nickname else session.username }}</span>
+                        <span class="role-badge">{{ '学生' if session.role == 'student' else '教师' }}</span>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="{{ url_for('auth.profile') }}" class="menu-item">
+                            <span class="menu-icon">👤</span>
+                            个人信息
+                        </a>
+                        <a href="{{ url_for('auth.change_password') }}" class="menu-item">
+                            <span class="menu-icon">🔑</span>
+                            修改密码
+                        </a>
+                        <a href="{{ url_for('auth.logout') }}" class="menu-item">
+                            <span class="menu-icon">🚪</span>
+                            退出登录
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 个人信息内容 -->
+            <div class="content">
+                <div class="profile-container">
+                    <div class="profile-header">
+                        <div class="avatar-section">
+                            <img src="{{ url_for('static', filename=session.avatar if session.avatar else 'images/sourceImg/default_avatar.jpg') }}" alt="用户头像" class="profile-avatar">
+                            <button class="change-avatar-btn">更换头像</button>
+                        </div>
+                        <div class="basic-info">
+                            <h1>{{ session.nickname if session.nickname else session.username }}</h1>
+                            <span class="role-tag">{{ '学生' if session.role == 'student' else '教师' }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-content">
+                        <form class="profile-form" method="POST" action="{{ url_for('auth.update_profile') }}">
+                            <div class="form-group">
+                                <label for="username">用户名</label>
+                                <input type="text" id="username" name="username" value="{{ session.username }}" readonly>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="nickname">昵称</label>
+                                <input type="text" id="nickname" name="nickname" value="{{ user.nickname if user.nickname else '' }}" placeholder="请输入您的真实姓名">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">邮箱</label>
+                                <input type="email" id="email" name="email" value="{{ user.email if user.email else '' }}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="phone">手机号码</label>
+                                <input type="tel" id="phone" name="phone" value="{{ user.phone if user.phone else '' }}">
+                            </div>
+                            
+                            {% if session.role == 'student' %}
+                            <div class="form-group">
+                                <label for="student_id">学号</label>
+                                <input type="text" id="student_id" name="student_id" value="{{ user.student_id if user.student_id else '' }}" readonly>
+                            </div>
+                            {% else %}
+                            <div class="form-group">
+                                <label for="teacher_id">教师编号</label>
+                                <input type="text" id="teacher_id" name="teacher_id" value="{{ user.teacher_id if user.teacher_id else '' }}" readonly>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="save-btn">保存更改</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='scripts/nav.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/dashboard.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/profile.js') }}"></script>
+</body>
+</html> 
