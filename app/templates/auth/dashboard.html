@@ -3,32 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>仪表板</title>
+    <title>{{ config.SYSTEM_NAME }} - 仪表板</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- 侧边栏 -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <a href="{{ url_for('auth.dashboard') }}">
-                    <img src="{{ url_for('static', filename='images/sourceImg/default_avatar.jpg') }}" alt="Logo" class="logo">
-                </a>
-            </div>
-            <nav class="sidebar-nav">
-                <ul>
-                    <li class="nav-item active">
-                        <a href="{{ url_for('auth.observe') }}"><span class="nav-icon">📊</span>观察</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#"><span class="nav-icon">📝</span>待定</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#"><span class="nav-icon">⚙️</span>设置</a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
+        {% with active_page = 'dashboard' %}
+        {% include 'auth/includes/sidebar.html' %}
+        {% endwith %}
 
         <!-- 主要内容区域 -->
         <main class="main-content">
@@ -39,7 +21,7 @@
                 </div>
                 <div class="user-menu">
                     <div class="user-info">
-                        <img src="{{ url_for('static', filename=session.avatar if session.avatar else 'images/sourceImg/default_avatar.jpg') }}" alt="用户头像" class="user-avatar">
+                        <img src="{{ url_for('static', filename=session.avatar if session.avatar else config.DEFAULT_AVATAR) }}" alt="用户头像" class="user-avatar">
                         <span class="username">{{ session.nickname if session.nickname else session.username }}</span>
                         <span class="role-badge">{{ '学生' if session.role == 'student' else '教师' }}</span>
                     </div>
@@ -65,6 +47,7 @@
                 <div class="welcome-section">
                     <h1>欢迎回来，{{ session.nickname if session.nickname else session.username }}</h1>
                     <p>当前身份：{{ '学生' if session.role == 'student' else '教师' }}</p>
+                    <p>系统版本：{{ config.VERSION }}</p>
                 </div>
             </div>
         </main>
