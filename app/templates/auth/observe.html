@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>仪表板</title>
+    <title>观察 - 仪表板</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/observe.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="{{ url_for('static', filename='scripts/ZLMRTCClient.js') }}"></script>
 </head>
 <body>
     <div class="dashboard-container">
@@ -35,7 +38,7 @@
             <!-- 顶部导航栏 -->
             <header class="top-nav">
                 <div class="nav-title">
-                    <h2>仪表板</h2>
+                    <h2>视频流观察</h2>
                 </div>
                 <div class="user-menu">
                     <div class="user-info">
@@ -62,15 +65,30 @@
 
             <!-- 页面内容 -->
             <div class="content">
-                <div class="welcome-section">
-                    <h1>欢迎回来，{{ session.nickname if session.nickname else session.username }}</h1>
-                    <p>当前身份：{{ '学生' if session.role == 'student' else '教师' }}</p>
+                <div class="observe-container">
+                    <div class="video-section">
+                        <video id="video" controls autoplay>
+                            您的浏览器不支持 HTML5 视频。
+                        </video>
+                    </div>
+                    <div class="controls">
+                        <div class="url-input">
+                            <label for="streamUrl">流地址：</label>
+                            <input type="text" id="streamUrl" 
+                                value="http://172.18.211.132/index/api/webrtc?app=live&stream=test&type=play" 
+                                placeholder="请输入流的 URL">
+                        </div>
+                        <div class="buttons">
+                            <button class="start-btn" onclick="start()">开始</button>
+                            <button class="stop-btn" onclick="stop()">停止</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
 
     <script src="{{ url_for('static', filename='scripts/nav.js') }}"></script>
-    <script src="{{ url_for('static', filename='scripts/dashboard.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/observe.js') }}"></script>
 </body>
 </html> 

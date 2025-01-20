@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>ZLM RTC 简易演示</title>
+  <!-- 引入 Axios 库，用于处理 HTTP 请求 -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <!-- 引入 ZLMRTCClient 客户端脚本 -->
+  <script src="{{ url_for('static', filename='js/ZLMRTCClient.js') }}"></script>
+  <!-- 引入外部 CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+  <div class="container">
+    <h1>ZLM RTC 简易演示</h1>
+    <!-- 视频元素，用于显示播放的流 -->
+    <video id="video" controls autoplay>
+      您的浏览器不支持 HTML5 视频。
+    </video>
+    <div class="controls">
+      <!-- 输入框用于填写流的 URL -->
+      <label for="streamUrl">流地址：</label>
+      <input
+        type="text"
+        id="streamUrl"
+        value="http://172.30.201.23/index/api/webrtc?app=live&stream=test&type=play"
+        placeholder="请输入流的 URL"
+      />
+      <!-- 控制按钮 -->
+      <div class="buttons">
+        <button class="start" onclick="start()">开始</button>
+        <button class="stop" onclick="stop()">停止</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 引入外部 JavaScript -->
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

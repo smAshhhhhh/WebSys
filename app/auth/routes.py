@@ -392,3 +392,8 @@ def change_password():
             conn.close()
     
     return render_template('auth/change_password.html')
+
+@bp.route('/observe')
+@login_required
+def observe():
+    return render_template('auth/observe.html')
