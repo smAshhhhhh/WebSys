@@ -24,3 +24,12 @@ class Messages:
     AVATAR_UPLOAD_FAILED = "头像上传失败"
     AVATAR_TYPE_ERROR = "只支持 PNG、JPG、JPEG 和 GIF 格式的图片"
     AVATAR_SIZE_ERROR = "图片大小不能超过5MB"
+
+    STREAM_EMPTY = "视频元素或流地址为空"
+    STREAM_INVALID = "请填写有效的流地址"
+    STREAM_CONNECT_SUCCESS = "视频流连接成功"
+    STREAM_CONNECT_FAILED = "视频流连接失败，请检查地址是否正确"
+    STREAM_ICE_ERROR = "ICE协商失败，请检查网络连接"
+    STREAM_PLAYER_ERROR = "无法启动播放器，请检查网络连接"
+    STREAM_STOP_SUCCESS = "已停止播放"
+    STREAM_STOP_ERROR = "停止播放时发生错误"

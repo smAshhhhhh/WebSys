@@ -25,7 +25,7 @@ class Config:
     LOGO_IMAGE = 'images/sourceImg/logo.png'  # 使用正斜杠和相对路径
     
     # 视频流配置
-    DEFAULT_STREAM_URL = 'http://172.30.201.23/index/api/webrtc?app=live&stream=test&type=play'
+    DEFAULT_STREAM_URL = 'http://172.18.211.132/index/api/webrtc?app=live&stream=test&type=play'
 
     # 安全配置
     SECRET_KEY = 'your_secret_key'  # 用于session加密

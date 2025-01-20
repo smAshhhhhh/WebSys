@@ -8,6 +8,15 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/observe.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="{{ url_for('static', filename='scripts/ZLMRTCClient.js') }}"></script>
+    <!-- 添加配置变量 -->
+    <script>
+        const APP_CONFIG = {
+            DEFAULT_STREAM_URL: "{{ config.DEFAULT_STREAM_URL | safe }}",
+            SYSTEM_NAME: "{{ config.SYSTEM_NAME }}",
+            VERSION: "{{ config.VERSION }}",
+            USER_ROLE: "{{ session.role }}"
+        };
+    </script>
 </head>
 <body>
     <div class="dashboard-container">
@@ -47,27 +56,76 @@
 
             <!-- 页面内容 -->
             <div class="content">
+                {% if session.role == 'student' %}
+                <!-- 学生界面：单个视频流 -->
                 <div class="observe-container">
-                    <div class="video-section">
-                        <video id="video" controls autoplay>
-                            您的浏览器不支持 HTML5 视频。
-                        </video>
-                    </div>
-                    <div class="controls">
-                        <div class="url-input">
-                            <label for="streamUrl">流地址：</label>
-                            <input type="text" id="streamUrl" 
-                                value="{{ config.DEFAULT_STREAM_URL }}" 
-                                placeholder="请输入流的 URL">
-                        </div>
-                        <div class="buttons">
-                            <button class="start-btn" onclick="start()">开始</button>
-                            <button class="stop-btn" onclick="stop()">停止</button>
+                    <div class="video-grid" id="videoGrid">
+                        <div class="video-item">
+                            <div class="video-wrapper">
+                                <video id="student_video" controls autoplay>
+                                    您的浏览器不支持 HTML5 视频。
+                                </video>
+                                <div class="video-controls">
+                                    <input type="text" class="stream-url" 
+                                        value="{{ config.DEFAULT_STREAM_URL | safe }}" 
+                                        placeholder="请输入流的 URL">
+                                    <div class="button-group">
+                                        <button class="start-btn">开始</button>
+                                        <button class="stop-btn">停止</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+                {% else %}
+                <!-- 教师界面：多个视频流 -->
+                <div class="observe-container teacher-mode">
+                    <div class="video-grid" id="videoGrid">
+                        <!-- 默认视频窗口 -->
+                        <div class="video-item">
+                            <div class="video-wrapper">
+                                <video controls autoplay>
+                                    您的浏览器不支持 HTML5 视频。
+                                </video>
+                                <div class="video-controls">
+                                    <input type="text" class="stream-url" 
+                                        value="{{ config.DEFAULT_STREAM_URL | safe }}" 
+                                        placeholder="请输入流的 URL">
+                                    <div class="button-group">
+                                        <button class="start-btn">开始</button>
+                                        <button class="stop-btn">停止</button>
+                                        <button class="remove-btn">删除</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 添加新视频窗口的按钮 -->
+                        <div class="add-video-btn" id="addVideoBtn">
+                            <span>+</span>
+                            <p>添加视频流</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </main>
+    </div>
+
+    <!-- 添加视频流的弹窗 -->
+    <div class="modal" id="addStreamModal">
+        <div class="modal-content">
+            <h3>添加新的视频流</h3>
+            <div class="modal-body">
+                <input type="text" id="newStreamUrl" 
+                    placeholder="请输入新的视频流地址"
+                    value="{{ config.DEFAULT_STREAM_URL | safe }}">
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn" onclick="closeModal()">取消</button>
+                <button class="confirm-btn" onclick="addNewStream()">确认</button>
+            </div>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='scripts/nav.js') }}"></script>

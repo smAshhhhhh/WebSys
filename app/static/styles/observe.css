@@ -5,12 +5,13 @@
     padding: 20px;
 }
 
+/* 基础视频样式 */
 .video-section {
     width: 100%;
     margin-bottom: 20px;
 }
 
-#video {
+video {
     width: 100%;
     max-width: 800px;
     height: auto;
@@ -20,6 +21,208 @@
     border-radius: 4px;
 }
 
+/* 教师模式样式 */
+.teacher-mode .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.video-item {
+    background: #f5f5f5;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.video-wrapper {
+    position: relative;
+}
+
+.video-wrapper video {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+}
+
+.video-controls {
+    padding: 10px;
+    background: #fff;
+}
+
+.stream-url {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+.button-group button {
+    flex: 1;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.start-btn {
+    background: var(--primary-color);
+    color: white;
+}
+
+.start-btn:hover {
+    background: #357abd;
+}
+
+.stop-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.stop-btn:hover {
+    background: #c82333;
+}
+
+.remove-btn {
+    background: #6c757d;
+    color: white;
+}
+
+.remove-btn:hover {
+    background: #5a6268;
+}
+
+/* 添加视频按钮 */
+.add-video-btn {
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.add-video-btn:hover {
+    border-color: var(--primary-color);
+    background: rgba(24, 144, 255, 0.05);
+}
+
+.add-video-btn span {
+    font-size: 48px;
+    color: var(--border-color);
+}
+
+.add-video-btn p {
+    margin-top: 10px;
+    color: var(--text-color);
+}
+
+/* 弹窗样式 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+}
+
+.modal-content h3 {
+    margin: 0 0 20px 0;
+    color: var(--text-color);
+}
+
+.modal-body {
+    margin-bottom: 20px;
+}
+
+.modal-body input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-footer button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.cancel-btn {
+    background: #f0f0f0;
+    color: var(--text-color);
+}
+
+.cancel-btn:hover {
+    background: #e0e0e0;
+}
+
+.confirm-btn {
+    background: var(--primary-color);
+    color: white;
+}
+
+.confirm-btn:hover {
+    background: #357abd;
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+    .observe-container {
+        padding: 10px;
+    }
+
+    .teacher-mode .video-grid {
+        grid-template-columns: 1fr;
+        padding: 10px;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .button-group button {
+        width: 100%;
+    }
+}
+
+/* 控制面板样式 */
 .controls {
     max-width: 800px;
     margin: 0 auto;
@@ -48,49 +251,4 @@
     display: flex;
     gap: 10px;
     justify-content: center;
-}
-
-.start-btn,
-.stop-btn {
-    padding: 8px 24px;
-    border: none;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.start-btn {
-    background: var(--primary-color);
-    color: white;
-}
-
-.start-btn:hover {
-    background: #357abd;
-}
-
-.stop-btn {
-    background: #dc3545;
-    color: white;
-}
-
-.stop-btn:hover {
-    background: #c82333;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-    .observe-container {
-        padding: 15px;
-    }
-
-    .buttons {
-        flex-direction: column;
-    }
-
-    .start-btn,
-    .stop-btn {
-        width: 100%;
-    }
 } 
