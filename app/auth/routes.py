@@ -1,11 +1,15 @@
 from flask import render_template, request, jsonify, session, redirect, url_for, current_app
 import pymysql
 import os
+import subprocess
+import psutil
+from datetime import datetime
 from werkzeug.utils import secure_filename
 from app.auth import bp
 from app.auth.utils import validate_username, validate_password, login_required, allowed_file
 from app.utils.db import get_db_connection
 from app.utils.messages import Messages
+import signal
 
 @bp.route('/')
 def index():
@@ -397,3 +401,247 @@ def change_password():
 @login_required
 def observe():
     return render_template('auth/observe.html')
+
+@bp.route('/record')
+@login_required
+def record():
+    conn = get_db_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    try:
+        # 获取用户的截图记录
+        cursor.execute("""
+            SELECT id, filename, created_at, description 
+            FROM screenshots 
+            WHERE user_id = %s 
+            ORDER BY created_at DESC
+        """, (session['user_id'],))
+        screenshots = cursor.fetchall()
+        
+        # 获取用户的录像记录
+        cursor.execute("""
+            SELECT id, filename, created_at, duration, description 
+            FROM recordings 
+            WHERE user_id = %s 
+            ORDER BY created_at DESC
+        """, (session['user_id'],))
+        recordings = cursor.fetchall()
+        
+        return render_template('auth/record.html', 
+                             screenshots=screenshots,
+                             recordings=recordings)
+    finally:
+        cursor.close()
+        conn.close()
+
+@bp.route('/delete_record', methods=['POST'])
+@login_required
+def delete_record():
+    try:
+        record_type = request.form.get('type')  # 'screenshot' 或 'recording'
+        record_id = request.form.get('id')
+        
+        if not record_type or not record_id:
+            return jsonify({'success': False, 'message': '参数不完整'})
+            
+        conn = get_db_connection()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        try:
+            # 获取文件信息
+            if record_type == 'screenshot':
+                cursor.execute("SELECT filename FROM screenshots WHERE id = %s AND user_id = %s",
+                             (record_id, session['user_id']))
+                table_name = 'screenshots'
+            else:
+                cursor.execute("SELECT filename FROM recordings WHERE id = %s AND user_id = %s",
+                             (record_id, session['user_id']))
+                table_name = 'recordings'
+                
+            record = cursor.fetchone()
+            if not record:
+                return jsonify({'success': False, 'message': '记录不存在或无权限删除'})
+                
+            # 删除文件
+            filepath = os.path.join(current_app.root_path, 'static', record['filename'])
+            if os.path.exists(filepath):
+                os.remove(filepath)
+                
+            # 删除数据库记录
+            cursor.execute(f"DELETE FROM {table_name} WHERE id = %s AND user_id = %s",
+                         (record_id, session['user_id']))
+            conn.commit()
+            
+            return jsonify({'success': True, 'message': '删除成功'})
+            
+        finally:
+            cursor.close()
+            conn.close()
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'删除失败: {str(e)}'})
+
+@bp.route('/screenshot', methods=['POST'])
+@login_required
+def take_screenshot():
+    try:
+        if 'screenshot' not in request.files:
+            return jsonify({'success': False, 'message': '未接收到截图数据'})
+
+        screenshot = request.files['screenshot']
+        if not screenshot:
+            return jsonify({'success': False, 'message': '截图数据为空'})
+
+        # 生成文件名
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"screenshot_{session['user_id']}_{timestamp}.jpg"
+        
+        # 确保目录存在
+        screenshots_dir = os.path.join(current_app.root_path, 'static', 'records', 'screenshots')
+        os.makedirs(screenshots_dir, exist_ok=True)
+        
+        # 保存文件的完整路径
+        filepath = os.path.join(screenshots_dir, filename)
+        
+        # 保存文件
+        screenshot.save(filepath)
+        
+        # 检查文件是否成功保存
+        if not os.path.exists(filepath) or os.path.getsize(filepath) == 0:
+            return jsonify({'success': False, 'message': '截图保存失败'})
+        
+        # 数据库中保存的相对路径（使用正斜杠）
+        db_filename = 'records/screenshots/' + filename
+        
+        # 保存到数据库
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                "INSERT INTO screenshots (user_id, filename, created_at) VALUES (%s, %s, %s)",
+                (session['user_id'], db_filename, datetime.now())
+            )
+            conn.commit()
+            
+            return jsonify({
+                'success': True,
+                'message': '截图成功',
+                'filename': filename
+            })
+        finally:
+            cursor.close()
+            conn.close()
+            
+    except Exception as e:
+        print(f"截图错误: {str(e)}")  # 添加错误日志
+        return jsonify({'success': False, 'message': f'系统错误: {str(e)}'})
+
+@bp.route('/save_recording', methods=['POST'])
+@login_required
+def save_recording():
+    try:
+        if 'video' not in request.files:
+            return jsonify({'success': False, 'message': '未接收到视频数据'})
+
+        video_file = request.files['video']
+        if not video_file:
+            return jsonify({'success': False, 'message': '视频数据为空'})
+
+        # 获取原始文件扩展名
+        original_filename = video_file.filename
+        extension = original_filename.rsplit('.', 1)[1].lower()
+        
+        # 生成文件名
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        temp_filename = f"temp_recording_{session['user_id']}_{timestamp}.{extension}"
+        final_filename = f"recording_{session['user_id']}_{timestamp}.mp4"
+        
+        # 确保目录存在
+        recordings_dir = os.path.join(current_app.root_path, 'static', 'records', 'recordings')
+        os.makedirs(recordings_dir, exist_ok=True)
+        
+        # 临时文件和最终文件的路径
+        temp_filepath = os.path.join(recordings_dir, temp_filename)
+        final_filepath = os.path.join(recordings_dir, final_filename)
+        
+        # 保存原始文件
+        video_file.save(temp_filepath)
+        
+        # 检查文件是否成功保存
+        if not os.path.exists(temp_filepath) or os.path.getsize(temp_filepath) == 0:
+            return jsonify({'success': False, 'message': '视频保存失败'})
+        
+        try:
+            # 转换为MP4格式（如果需要）
+            if extension != 'mp4':
+                command = [
+                    'ffmpeg',
+                    '-i', temp_filepath,
+                    '-c:v', 'libx264',  # 视频编码器
+                    '-preset', 'fast',   # 编码速度
+                    '-crf', '22',        # 视频质量
+                    '-c:a', 'aac',       # 音频编码器
+                    '-strict', 'experimental',
+                    '-movflags', '+faststart',  # 优化MP4文件结构
+                    final_filepath
+                ]
+                
+                # 执行转换
+                result = subprocess.run(command, capture_output=True, text=True)
+                if result.returncode != 0:
+                    print(f"FFmpeg转换错误: {result.stderr}")
+                    return jsonify({'success': False, 'message': '视频格式转换失败'})
+                
+                # 删除临时文件
+                os.remove(temp_filepath)
+                
+                # 检查转换后的文件
+                if not os.path.exists(final_filepath) or os.path.getsize(final_filepath) == 0:
+                    return jsonify({'success': False, 'message': '视频格式转换失败'})
+            else:
+                # 如果已经是MP4格式，直接重命名
+                os.rename(temp_filepath, final_filepath)
+        
+            # 获取视频时长
+            duration = 0
+            try:
+                duration_cmd = [
+                    'ffprobe',
+                    '-v', 'error',
+                    '-show_entries', 'format=duration',
+                    '-of', 'default=noprint_wrappers=1:nokey=1',
+                    final_filepath
+                ]
+                duration = float(subprocess.check_output(duration_cmd).decode().strip())
+            except Exception as e:
+                print(f"获取视频时长错误: {str(e)}")
+                duration = 0
+            
+            # 数据库中保存的相对路径
+            db_filename = os.path.join('records', 'recordings', final_filename).replace('\\', '/')
+            
+            # 保存到数据库
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            try:
+                cursor.execute(
+                    "INSERT INTO recordings (user_id, filename, duration, created_at) VALUES (%s, %s, %s, %s)",
+                    (session['user_id'], db_filename, int(duration), datetime.now())
+                )
+                conn.commit()
+                
+                return jsonify({
+                    'success': True,
+                    'message': '视频保存成功',
+                    'filename': final_filename,
+                    'duration': int(duration)
+                })
+            finally:
+                cursor.close()
+                conn.close()
+                
+        except subprocess.CalledProcessError as e:
+            print(f"视频转换错误: {e.stderr.decode() if e.stderr else str(e)}")
+            return jsonify({'success': False, 'message': '视频格式转换失败'})
+            
+    except Exception as e:
+        print(f"保存视频错误: {str(e)}")
+        return jsonify({'success': False, 'message': f'系统错误: {str(e)}'})

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ config.SYSTEM_NAME }} - 记录</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/record.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        {% with active_page = 'record' %}
+        {% include 'auth/includes/sidebar.html' %}
+        {% endwith %}
+        
+        <main class="main-content">
+            <header class="top-nav">
+                <div class="nav-title">
+                    <h2>记录</h2>
+                </div>
+                <div class="user-menu">
+                    <div class="user-info">
+                        <img src="{{ url_for('static', filename=session.avatar if session.avatar else config.DEFAULT_AVATAR) }}" alt="用户头像" class="user-avatar">
+                        <span class="username">{{ session.nickname if session.nickname else session.username }}</span>
+                        <span class="role-badge">{{ '学生' if session.role == 'student' else '教师' }}</span>
+                    </div>
+                    <div class="dropdown-menu">
+                        <a href="{{ url_for('auth.profile') }}" class="menu-item">
+                            <span class="menu-icon">👤</span>
+                            个人信息
+                        </a>
+                        <a href="{{ url_for('auth.change_password') }}" class="menu-item">
+                            <span class="menu-icon">🔑</span>
+                            修改密码
+                        </a>
+                        <a href="{{ url_for('auth.logout') }}" class="menu-item">
+                            <span class="menu-icon">🚪</span>
+                            退出登录
+                        </a>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="content">
+                <div class="record-container">
+                    <!-- 截图部分 -->
+                    <div class="record-section">
+                        <h2>截图记录</h2>
+                        <div class="record-grid">
+                            {% for screenshot in screenshots %}
+                            <div class="record-item">
+                                <div class="record-media" onclick="showImage('{{ url_for('static', filename=screenshot.filename) }}')">
+                                    <img src="{{ url_for('static', filename=screenshot.filename) }}" alt="截图" loading="lazy">
+                                </div>
+                                <div class="record-content">
+                                    <div class="record-info">
+                                        <p>创建时间：{{ screenshot.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                                        {% if screenshot.description %}
+                                        <p>描述：{{ screenshot.description }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="record-actions">
+                                        <button class="delete-btn" onclick="deleteRecord('screenshot', {{ screenshot.id }})">删除</button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <p>暂无截图记录</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- 录像部分 -->
+                    <div class="record-section">
+                        <h2>录像记录</h2>
+                        <div class="record-grid">
+                            {% for recording in recordings %}
+                            <div class="record-item">
+                                <div class="record-media">
+                                    <video controls preload="metadata">
+                                        <source src="{{ url_for('static', filename=recording.filename) }}" type="video/mp4">
+                                        您的浏览器不支持视频播放
+                                    </video>
+                                </div>
+                                <div class="record-content">
+                                    <div class="record-info">
+                                        <p>创建时间：{{ recording.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                                        <p>时长：{{ recording.duration }}秒</p>
+                                        {% if recording.description %}
+                                        <p>描述：{{ recording.description }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="record-actions">
+                                        <button class="delete-btn" onclick="deleteRecord('recording', {{ recording.id }})">删除</button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <p>暂无录像记录</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 图片查看器 -->
+    <div class="image-viewer" onclick="hideImageViewer()">
+        <button class="close-btn" onclick="hideImageViewer()">
+            <i class="fas fa-times"></i>
+        </button>
+        <img src="" alt="查看大图">
+    </div>
+
+    <script src="{{ url_for('static', filename='scripts/nav.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/record.js') }}"></script>
+</body>
+</html> 

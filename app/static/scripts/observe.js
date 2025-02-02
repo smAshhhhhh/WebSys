@@ -1,6 +1,27 @@
 // 存储所有视频播放器实例
 const players = new Map();
 
+// 存储MediaRecorder实例和录制的数据
+let mediaRecorder = null;
+let recordedChunks = [];
+
+// 检查支持的MIME类型
+function getSupportedMimeType() {
+    const possibleTypes = [
+        'video/mp4;codecs=h264,aac',
+        'video/webm;codecs=h264,opus',
+        'video/webm;codecs=vp9,opus',
+        'video/webm;codecs=vp8,opus'
+    ];
+    
+    for (const type of possibleTypes) {
+        if (MediaRecorder.isTypeSupported(type)) {
+            return type;
+        }
+    }
+    return null;
+}
+
 // 单个视频流的控制函数
 function start(videoElement, streamUrl) {
     if (!videoElement || !streamUrl) {
@@ -111,9 +132,9 @@ function addNewStream() {
         return;
     }
 
-    const addButton = document.getElementById('addVideoBtn');
-    if (!addButton) {
-        console.error('找不到添加按钮');
+    const addButtonContainer = videoGrid.querySelector('.video-item:last-child');
+    if (!addButtonContainer) {
+        console.error('找不到添加按钮容器');
         return;
     }
     
@@ -129,13 +150,143 @@ function addNewStream() {
     }
     
     // 插入到添加按钮之前
-    videoGrid.insertBefore(videoItem, addButton);
+    videoGrid.insertBefore(videoItem, addButtonContainer);
     
     // 绑定控制按钮事件
     bindVideoControls(videoItem);
     
     // 关闭弹窗
     closeModal();
+}
+
+// 截图功能
+function takeScreenshot(videoElement) {
+    // 检查视频是否正在播放
+    if (!videoElement.srcObject) {
+        alert('请先开始视频流播放');
+        return;
+    }
+
+    try {
+        // 创建canvas元素
+        const canvas = document.createElement('canvas');
+        canvas.width = videoElement.videoWidth;
+        canvas.height = videoElement.videoHeight;
+        
+        // 在canvas上绘制当前视频帧
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+        
+        // 将canvas内容转换为blob
+        canvas.toBlob(function(blob) {
+            // 创建FormData对象
+            const formData = new FormData();
+            formData.append('screenshot', blob, 'screenshot.jpg');
+            
+            // 发送到服务器
+            fetch('/auth/screenshot', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('截图成功');
+                } else {
+                    alert(data.message || '截图失败');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('截图失败，请重试');
+            });
+        }, 'image/jpeg', 0.95); // 使用JPEG格式，95%的质量
+    } catch (error) {
+        console.error('Screenshot error:', error);
+        alert('截图失败，请重试');
+    }
+}
+
+// 开始录像
+function startRecording(videoElement, recordBtn) {
+    if (!videoElement.srcObject) {
+        alert('请先开始视频流播放');
+        return;
+    }
+
+    try {
+        const mimeType = getSupportedMimeType();
+        if (!mimeType) {
+            throw new Error('浏览器不支持视频录制');
+        }
+
+        // 创建MediaRecorder实例
+        mediaRecorder = new MediaRecorder(videoElement.srcObject, {
+            mimeType: mimeType,
+            videoBitsPerSecond: 2500000 // 2.5Mbps
+        });
+
+        // 处理录制的数据
+        mediaRecorder.ondataavailable = function(event) {
+            if (event.data.size > 0) {
+                recordedChunks.push(event.data);
+            }
+        };
+
+        // 录制停止时的处理
+        mediaRecorder.onstop = function() {
+            // 创建Blob对象
+            const blob = new Blob(recordedChunks, {
+                type: mimeType
+            });
+
+            // 创建FormData对象
+            const formData = new FormData();
+            const fileExtension = mimeType.startsWith('video/mp4') ? '.mp4' : '.webm';
+            formData.append('video', blob, 'recording' + fileExtension);
+
+            // 发送到服务器
+            fetch('/auth/save_recording', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('录制已保存');
+                } else {
+                    alert(data.message || '保存录制失败');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('保存录制失败，请重试');
+            })
+            .finally(() => {
+                // 清理录制数据
+                recordedChunks = [];
+                recordBtn.textContent = '开始录像';
+                recordBtn.classList.remove('recording');
+            });
+        };
+
+        // 开始录制
+        recordedChunks = [];
+        mediaRecorder.start(1000); // 每秒生成一个数据片段
+        recordBtn.textContent = '停止录像';
+        recordBtn.classList.add('recording');
+        
+    } catch (error) {
+        console.error('Recording error:', error);
+        alert('无法开始录制：' + error.message);
+    }
+}
+
+// 停止录像
+function stopRecording(recordBtn) {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+    }
 }
 
 // 绑定视频控制按钮事件
@@ -149,6 +300,8 @@ function bindVideoControls(videoItem) {
     const urlInput = videoItem.querySelector('.stream-url');
     const startBtn = videoItem.querySelector('.start-btn');
     const stopBtn = videoItem.querySelector('.stop-btn');
+    const screenshotBtn = videoItem.querySelector('.screenshot-btn');
+    const recordBtn = videoItem.querySelector('.record-btn');
     const removeBtn = videoItem.querySelector('.remove-btn'); // 可能不存在
 
     if (!video || !urlInput || !startBtn || !stopBtn) {
@@ -166,6 +319,20 @@ function bindVideoControls(videoItem) {
     });
 
     stopBtn.addEventListener('click', () => stop(video));
+    
+    if (screenshotBtn) {
+        screenshotBtn.addEventListener('click', () => takeScreenshot(video));
+    }
+    
+    if (recordBtn) {
+        recordBtn.addEventListener('click', () => {
+            if (recordBtn.classList.contains('recording')) {
+                stopRecording(recordBtn);
+            } else {
+                startRecording(video, recordBtn);
+            }
+        });
+    }
     
     // 只有在教师模式下才有删除按钮
     if (removeBtn) {

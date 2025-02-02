@@ -2,8 +2,10 @@ import os
 
 class Config:
     # 基本配置
-    SECRET_KEY = 'your_secret_key'  # 请在生产环境中使用安全的密钥
-    
+    SECRET_KEY = 'your-secret-key'  # 用于session加密
+    SYSTEM_NAME = '视频监控系统'
+    VERSION = 'v1.0.0'
+
     # 数据库配置
     DB_CONFIG = {
         'host': 'localhost',
@@ -22,14 +24,29 @@ class Config:
     # 默认头像
     DEFAULT_AVATAR = 'images/sourceImg/default_avatar.jpg'
     # 默认logo
-    LOGO_IMAGE = 'images/sourceImg/logo.png'  # 使用正斜杠和相对路径
+    LOGO_IMAGE = 'images/sourceImg/logo.png'
     
     # 视频流配置
-    DEFAULT_STREAM_URL = 'http://172.18.211.132/index/api/webrtc?app=live&stream=test&type=play'
+    DEFAULT_STREAM_URL = 'http://172.26.83.182/index/api/webrtc?app=live&stream=video&type=play'
 
-    # 安全配置
-    SECRET_KEY = 'your_secret_key'  # 用于session加密
+    # 记录文件存储配置
+    RECORD_BASE_DIR = 'app/static/records'
+    SCREENSHOTS_FOLDER = 'app/static/records/screenshots'
+    RECORDINGS_FOLDER = 'app/static/records/recordings'
+    RECORD_URL_PREFIX = '/static/records'
+
+    # 文件类型限制
+    ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+    ALLOWED_VIDEO_EXTENSIONS = {'mp4', 'webm'}
     
-    # 其他系统配置
-    SYSTEM_NAME = '智能监控系统'
-    VERSION = '1.0.0'
+    # 文件大小限制
+    MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB
+    MAX_VIDEO_SIZE = 500 * 1024 * 1024  # 500MB
+
+    # 视频录制配置
+    MAX_RECORDING_DURATION = 3600  # 最大录制时长（秒）
+    VIDEO_QUALITY = {
+        'resolution': '1280x720',  # 视频分辨率
+        'framerate': '30',  # 帧率
+        'bitrate': '1M'  # 比特率
+    }

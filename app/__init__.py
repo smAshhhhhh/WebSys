@@ -10,9 +10,16 @@ def create_app(config_class=Config):
     from app.auth import bp as auth_bp
     app.register_blueprint(auth_bp)
 
-    # 确保上传目录存在
+    # 确保必要的目录存在
     import os
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    required_dirs = [
+        app.config['UPLOAD_FOLDER'],
+        app.config['RECORD_BASE_DIR'],
+        app.config['SCREENSHOTS_FOLDER'],
+        app.config['RECORDINGS_FOLDER']
+    ]
+    for directory in required_dirs:
+        os.makedirs(directory, exist_ok=True)
 
     # 添加根路由重定向
     @app.route('/')

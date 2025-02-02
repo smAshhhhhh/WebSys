@@ -24,9 +24,28 @@ video {
 /* 教师模式样式 */
 .teacher-mode .video-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
     padding: 20px;
+}
+
+/* 根据内容数量（包括添加按钮）动态调整布局 */
+.teacher-mode .video-grid {
+    grid-template-columns: repeat(1, 1fr);
+}
+
+/* 2个元素时 */
+.teacher-mode .video-grid:has(.video-item:first-child ~ *:last-child) {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+/* 3个元素时 */
+.teacher-mode .video-grid:has(.video-item:first-child ~ *:nth-child(2) ~ *:last-child) {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* 4个及以上元素时 */
+.teacher-mode .video-grid:has(.video-item:first-child ~ *:nth-child(2) ~ *:nth-child(3) ~ *) {
+    grid-template-columns: repeat(4, 1fr);
 }
 
 .video-item {
@@ -109,8 +128,10 @@ video {
     align-items: center;
     justify-content: center;
     min-height: 200px;
+    height: 100%;
     cursor: pointer;
     transition: all 0.3s;
+    background: #fff;
 }
 
 .add-video-btn:hover {
@@ -203,22 +224,22 @@ video {
 }
 
 /* 响应式布局 */
+@media (max-width: 1600px) {
+    .teacher-mode .video-grid:has(.video-item:first-child ~ *:nth-child(2) ~ *) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 1200px) {
+    .teacher-mode .video-grid:has(.video-item:first-child ~ *) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 768px) {
-    .observe-container {
-        padding: 10px;
-    }
-
     .teacher-mode .video-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
         padding: 10px;
-    }
-
-    .button-group {
-        flex-direction: column;
-    }
-
-    .button-group button {
-        width: 100%;
     }
 }
 
@@ -251,4 +272,31 @@ video {
     display: flex;
     gap: 10px;
     justify-content: center;
+}
+
+.screenshot-btn {
+    background: #28a745;
+    color: white;
+}
+
+.screenshot-btn:hover {
+    background: #218838;
+}
+
+.record-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.record-btn:hover {
+    background: #c82333;
+}
+
+.record-btn.recording {
+    background: #ffc107;
+    color: black;
+}
+
+.record-btn.recording:hover {
+    background: #e0a800;
 } 

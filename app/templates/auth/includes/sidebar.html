@@ -10,8 +10,8 @@
             <li class="nav-item {{ 'active' if active_page == 'observe' else '' }}">
                 <a href="{{ url_for('auth.observe') }}"><span class="nav-icon">📊</span>观察</a>
             </li>
-            <li class="nav-item">
-                <a href="#"><span class="nav-icon">📝</span>待定</a>
+            <li class="nav-item {{ 'active' if active_page == 'record' else '' }}">
+                <a href="{{ url_for('auth.record') }}"><span class="nav-icon">📝</span>记录</a>
             </li>
             <li class="nav-item">
                 <a href="#"><span class="nav-icon">⚙️</span>设置</a>
