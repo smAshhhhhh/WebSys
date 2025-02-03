@@ -90,6 +90,7 @@ video {
     cursor: pointer;
     font-size: 14px;
     transition: background-color 0.3s;
+    white-space: nowrap;
 }
 
 .start-btn {
@@ -108,6 +109,33 @@ video {
 
 .stop-btn:hover {
     background: #c82333;
+}
+
+.screenshot-btn {
+    background: #28a745;
+    color: white;
+}
+
+.screenshot-btn:hover {
+    background: #218838;
+}
+
+.record-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.record-btn:hover {
+    background: #c82333;
+}
+
+.record-btn.recording {
+    background: #ffc107;
+    color: black;
+}
+
+.record-btn.recording:hover {
+    background: #e0a800;
 }
 
 .remove-btn {
@@ -272,31 +300,4 @@ video {
     display: flex;
     gap: 10px;
     justify-content: center;
-}
-
-.screenshot-btn {
-    background: #28a745;
-    color: white;
-}
-
-.screenshot-btn:hover {
-    background: #218838;
-}
-
-.record-btn {
-    background: #dc3545;
-    color: white;
-}
-
-.record-btn:hover {
-    background: #c82333;
-}
-
-.record-btn.recording {
-    background: #ffc107;
-    color: black;
-}
-
-.record-btn.recording:hover {
-    background: #e0a800;
 } 

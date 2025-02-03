@@ -27,7 +27,7 @@ class Config:
     LOGO_IMAGE = 'images/sourceImg/logo.png'
     
     # 视频流配置
-    DEFAULT_STREAM_URL = 'http://172.26.83.182/index/api/webrtc?app=live&stream=video&type=play'
+    DEFAULT_STREAM_URL = 'http://172.18.103.221/index/api/webrtc?app=live&stream=video2&type=play'
 
     # 记录文件存储配置
     RECORD_BASE_DIR = 'app/static/records'

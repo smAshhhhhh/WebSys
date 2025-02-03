@@ -6,8 +6,8 @@ import subprocess
 model = torch.hub.load('D:/Code/github/yolov5', 'custom', path='runs/train/exp11/weights/best.pt', source='local')
 
 # 2. 输入和输出流地址
-input_stream = "rtsp://192.168.0.103:554/11"  # 输入 RTSP 流
-output_stream = "rtmp://172.26.83.182/live/video1"  # 输出 RTMP 流地址
+input_stream = "rtsp://192.168.0.102:554/11"  # 输入 RTSP 流
+output_stream = "rtmp://172.18.103.221/live/video1"  # 输出 RTMP 流地址
 
 # 3. 打开 RTSP 视频流
 cap = cv2.VideoCapture(input_stream)

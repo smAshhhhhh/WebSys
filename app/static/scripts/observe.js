@@ -79,17 +79,37 @@ function stop(videoElement) {
         return;
     }
 
-    const playerId = videoElement.id || `video_${Date.now()}`;
+    const playerId = videoElement.id;
+    if (!playerId) {
+        console.error('视频元素缺少ID属性');
+        return;
+    }
+
+    console.log(`正在停止播放器: ${playerId}`);
     const player = players.get(playerId);
+    
     if (player) {
         try {
             player.close();
             players.delete(playerId);
+            console.log(`成功关闭播放器: ${playerId}`);
+        } catch (error) {
+            console.error(`关闭播放器出错 ${playerId}:`, error);
+        }
+    } else {
+        console.log(`未找到播放器实例: ${playerId}`);
+    }
+
+    try {
+        if (videoElement.srcObject) {
+            const tracks = videoElement.srcObject.getTracks();
+            tracks.forEach(track => track.stop());
+        }
             videoElement.srcObject = null;
             videoElement.load();
+        console.log(`成功清理视频元素: ${playerId}`);
         } catch (error) {
-            console.error(`Error stopping player ${playerId}:`, error);
-        }
+        console.error(`清理视频元素出错 ${playerId}:`, error);
     }
 }
 
@@ -109,6 +129,8 @@ function createVideoElement() {
                     <div class="button-group">
                         <button class="start-btn">开始</button>
                         <button class="stop-btn">停止</button>
+                        <button class="screenshot-btn" title="截图"><i class="fas fa-camera"></i> 截图</button>
+                        <button class="record-btn" title="录像"><i class="fas fa-video"></i> 开始录像</button>
                         <button class="remove-btn">删除</button>
                     </div>
                 </div>
@@ -302,7 +324,7 @@ function bindVideoControls(videoItem) {
     const stopBtn = videoItem.querySelector('.stop-btn');
     const screenshotBtn = videoItem.querySelector('.screenshot-btn');
     const recordBtn = videoItem.querySelector('.record-btn');
-    const removeBtn = videoItem.querySelector('.remove-btn'); // 可能不存在
+    const removeBtn = videoItem.querySelector('.remove-btn');
 
     if (!video || !urlInput || !startBtn || !stopBtn) {
         console.error('找不到必要的控制元素');
@@ -334,7 +356,6 @@ function bindVideoControls(videoItem) {
         });
     }
     
-    // 只有在教师模式下才有删除按钮
     if (removeBtn) {
         removeBtn.addEventListener('click', () => {
             if (confirm('确定要删除此视频窗口吗？')) {
